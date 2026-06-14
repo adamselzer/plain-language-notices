@@ -98,19 +98,27 @@ facts so the gate has ground truth. Synthetic only; no real notices are used.
 The four-way harness reports, per system, the target-grade hit rate, mean reading
 grade, **faithfulness pass rate (the gate)**, mean latency, and mean cost.
 
-**Offline reference run** (`--offline`, no key) — the gold plain targets set the
-ceiling and validate the gate:
+Results on the 15 held-out notices (reference = gold targets; base-prompted and
+RAG via Claude; fine-tuned pending the Colab run):
 
-| System | Target-grade hit | Mean FK grade | Faithfulness pass |
-|---|---|---|---|
-| reference (gold targets) | 93% | 4.3 | 100% |
+| System | Target-grade hit | Mean FK grade | Faithfulness pass | Cost/notice |
+|---|---|---|---|---|
+| reference (gold targets) | 93% | 4.3 | 100% | — |
+| base-prompted | 20% | 8.5 | 100% | $0.0018 |
+| RAG (plain-language guide in context) | 100% | 4.2 | 100% | $0.0019 |
+| fine-tuned | _train via `train/finetune_lora.ipynb`_ | | | |
 
-The model rows (`base_prompted`, `rag`, `fine_tuned`) populate when a key and a
-trained adapter are present. The story they tell: prompting and RAG can hit the
-reading level, but the headline is the cost-and-consistency case for a small
-fine-tune at scale, gated by faithfulness so it can never ship a readable notice
-that is legally wrong. A small human-rated sample (tone/clarity on ~20 examples)
-sanity-checks the automated scores.
+What this shows, and the case for fine-tuning: **plain prompting hits the target
+reading level only 20% of the time** (mean grade 8.5, above the sixth-to-eighth
+grade target); putting the plain-language style guide in context (RAG) fixes
+readability completely (100%). The fine-tune's job is to match that readability
+*without* carrying the guide in every prompt, at lower cost and latency across
+millions of notices. That is the row the Colab training fills in.
+
+Faithfulness is 100% across all systems here because the synthetic notices are
+simple and the models are strong; the gate earns its keep on harder notices where a
+model drops or alters an operative fact. A small human-rated sample (tone/clarity on
+~20 examples) sanity-checks the automated scores.
 
 ## What I'd do differently at production scale
 

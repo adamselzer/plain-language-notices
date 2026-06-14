@@ -17,3 +17,5 @@ outputs/
 *.gguf
 # OS
 .DS_Store
+# Transient eval run log
+eval/_llm_run.log
