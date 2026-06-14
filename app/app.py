@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import streamlit as st
 
-from app._ui import apply_theme, footer, header
+from app._ui import apply_theme, case_study, footer, header
 from src.config import TARGET_GRADE, has_llm
 from src.faithfulness import check_faithfulness
 from src.readability import flesch_kincaid_grade
@@ -34,6 +34,34 @@ HOLDOUT = Path(__file__).resolve().parent.parent / "data" / "holdout.jsonl"
 
 st.set_page_config(page_title="Plain-language notices", layout="wide")
 apply_theme(st)
+
+CASE_STUDY = """
+<p class="cs-lead">Rewrite bureaucratic benefit notices into plain language while provably preserving every legally operative fact — the amount, the dates, the action, and the appeal rights.</p>
+
+<h2>Who it is for, and the need</h2>
+<p>People lose benefits they qualify for because they cannot understand the letters an agency sends. Rewriting those notices in plain language helps, at the scale of millions of notices. But a rewrite that reads beautifully and drops the appeal deadline is worse than the jargon it replaced. So the need is not just readability; it is readability that never loses a legally operative fact.</p>
+
+<h2>What it does</h2>
+<p>It pairs each bureaucratic notice with a plain rewrite, scores the reading level, and runs a faithfulness gate that checks the operative facts survived exactly. It compares approaches — base-prompted, retrieval-augmented, and a small fine-tune — on readability, faithfulness, cost, and latency.</p>
+
+<h2>Technical decisions</h2>
+<div class="dec"><b>Fine-tune for this; RAG for policy questions</b><p>Rewriting is fixed-format, fixed-tone, high-volume work a small fine-tune holds cheaply. Policy Q&A belongs in retrieval, because policy changes and needs citations. Naming the boundary is the point.</p><p class="alt">Instead of: fine-tuning everything, or prompting everything.</p></div>
+<div class="dec"><b>A deterministic faithfulness gate</b><p>Amounts, dates, the action, and appeal rights are checked by exact matching; a drop or change fails outright. Preservation of the reason is semantic, so it is judged by an LLM, not brittle token matching.</p><p class="alt">Instead of: judging faithfulness entirely with a model, or trusting a readability score alone.</p></div>
+<div class="dec"><b>Self-contained readability</b><p>Flesch-Kincaid is implemented directly rather than via a library that downloads a corpus at runtime and fails offline.</p><p class="alt">Instead of: a dependency that breaks in locked-down environments.</p></div>
+<div class="dec"><b>Training off the laptop</b><p>The LoRA fine-tune runs on a free Colab GPU; the data pipeline, the gate, the eval, and the tests run anywhere with no GPU.</p><p class="alt">Instead of: making heavy training libraries a requirement to open the repo.</p></div>
+
+<h2>Design decisions</h2>
+<div class="dec"><b>Readability paired with the gate</b><p>The reading grade and the preserved-facts checklist sit together, so a reviewer sees that a low grade is only acceptable if every fact survived.</p><p class="alt">Instead of: a reading-level number on its own, which hides the dangerous failure.</p></div>
+<div class="dec"><b>Before and after, side by side</b><p>The bureaucratic original and the plain rewrite sit in two columns with a word-level diff, so the transformation is legible.</p><p class="alt">Instead of: showing only the output.</p></div>
+
+<h2>Honest limitations</h2>
+<ul>
+<li>The synthetic notices are simple, so all systems preserve the facts (100%); the gate earns its keep on harder notices.</li>
+<li>The fine-tuned row of the comparison awaits the Colab training run.</li>
+<li>A larger human-rated sample would anchor the automated readability and faithfulness scores.</li>
+</ul>
+"""
+
 header(
     st,
     "Safety-Net AI · Fine-tuning",
@@ -48,47 +76,52 @@ if not pairs:
     st.error("No holdout notices. Run `python data/generate_pairs.py` first.")
     st.stop()
 
-choice = st.selectbox("Holdout notice", [p.id for p in pairs])
-pair = next(p for p in pairs if p.id == choice)
-
 use_llm = has_llm() and st.sidebar.checkbox("Generate with base-prompted Claude", value=False)
+tab_demo, tab_about = st.tabs(["Live demo", "How it works"])
 
-if use_llm:
-    from src.baselines import base_prompted_rewrite
-    with st.spinner("Generating plain rewrite..."):
-        plain, _, _, _ = base_prompted_rewrite(pair.original)
-    source = "base-prompted Claude"
-else:
-    plain = pair.target
-    source = "gold reference target" + ("" if has_llm() else " (no API key set)")
+with tab_demo:
+    choice = st.selectbox("Holdout notice", [p.id for p in pairs])
+    pair = next(p for p in pairs if p.id == choice)
 
-c1, c2 = st.columns(2)
-with c1:
-    st.subheader("Original (bureaucratic)")
-    st.write(pair.original)
-    st.metric("Flesch-Kincaid grade", flesch_kincaid_grade(pair.original))
-with c2:
-    st.subheader(f"Plain version — {source}")
-    st.write(plain)
-    grade = flesch_kincaid_grade(plain)
-    st.metric("Flesch-Kincaid grade", grade, delta=round(grade - flesch_kincaid_grade(pair.original), 1))
-    if grade <= TARGET_GRADE:
-        st.success(f"At or below the target reading grade ({TARGET_GRADE:.0f}).")
+    if use_llm:
+        from src.baselines import base_prompted_rewrite
+        with st.spinner("Generating plain rewrite..."):
+            plain, _, _, _ = base_prompted_rewrite(pair.original)
+        source = "base-prompted Claude"
     else:
-        st.warning(f"Above the target reading grade ({TARGET_GRADE:.0f}).")
+        plain = pair.target
+        source = "gold reference target" + ("" if has_llm() else " (no API key set)")
 
-st.subheader("Preserved-facts checklist (the gate)")
-result = check_faithfulness(pair.operative_facts, plain)
-for c in result.checks:
-    icon = "✅" if c.preserved else "❌"
-    st.markdown(f"{icon} **{c.fact}** — {c.detail}")
-if result.passed:
-    st.success("All operative facts preserved. Safe to send.")
-else:
-    st.error("An operative fact was dropped or altered. This rewrite must not ship.")
+    c1, c2 = st.columns(2)
+    with c1:
+        st.subheader("Original (bureaucratic)")
+        st.write(pair.original)
+        st.metric("Flesch-Kincaid grade", flesch_kincaid_grade(pair.original))
+    with c2:
+        st.subheader(f"Plain version — {source}")
+        st.write(plain)
+        grade = flesch_kincaid_grade(plain)
+        st.metric("Flesch-Kincaid grade", grade, delta=round(grade - flesch_kincaid_grade(pair.original), 1))
+        if grade <= TARGET_GRADE:
+            st.success(f"At or below the target reading grade ({TARGET_GRADE:.0f}).")
+        else:
+            st.warning(f"Above the target reading grade ({TARGET_GRADE:.0f}).")
 
-with st.expander("Word-level diff"):
-    diff = difflib.unified_diff(pair.original.split(), plain.split(), lineterm="", n=0)
-    st.code("\n".join(list(diff)[2:]) or "(identical)")
+    st.subheader("Preserved-facts checklist (the gate)")
+    result = check_faithfulness(pair.operative_facts, plain)
+    for c in result.checks:
+        icon = "✅" if c.preserved else "❌"
+        st.markdown(f"{icon} **{c.fact}** — {c.detail}")
+    if result.passed:
+        st.success("All operative facts preserved. Safe to send.")
+    else:
+        st.error("An operative fact was dropped or altered. This rewrite must not ship.")
+
+    with st.expander("Word-level diff"):
+        diff = difflib.unified_diff(pair.original.split(), plain.split(), lineterm="", n=0)
+        st.code("\n".join(list(diff)[2:]) or "(identical)")
+
+with tab_about:
+    case_study(st, CASE_STUDY)
 
 footer(st, "Synthetic notices, no PII · readability paired with a faithfulness gate")
