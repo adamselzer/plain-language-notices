@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import streamlit as st
 
+from app._ui import apply_theme, footer, header
 from src.config import TARGET_GRADE, has_llm
 from src.faithfulness import check_faithfulness
 from src.readability import flesch_kincaid_grade
@@ -32,11 +33,14 @@ from src.schema import NoticePair
 HOLDOUT = Path(__file__).resolve().parent.parent / "data" / "holdout.jsonl"
 
 st.set_page_config(page_title="Plain-language notices", layout="wide")
-st.title("Plain-language benefit notices")
-st.caption(
+apply_theme(st)
+header(
+    st,
+    "Safety-Net AI · Fine-tuning",
+    "Plain-language benefit notices",
     "Rewrite a bureaucratic notice into plain language while preserving every "
     "operative fact. The checklist runs a deterministic faithfulness gate: a "
-    "readable rewrite that drops the appeal deadline or changes the amount fails."
+    "readable rewrite that drops the appeal deadline or changes the amount fails.",
 )
 
 pairs = [NoticePair(**json.loads(l)) for l in HOLDOUT.read_text().splitlines() if l.strip()]
@@ -86,3 +90,5 @@ else:
 with st.expander("Word-level diff"):
     diff = difflib.unified_diff(pair.original.split(), plain.split(), lineterm="", n=0)
     st.code("\n".join(list(diff)[2:]) or "(identical)")
+
+footer(st, "Synthetic notices, no PII · readability paired with a faithfulness gate")
