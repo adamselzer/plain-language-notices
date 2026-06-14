@@ -1,0 +1,32 @@
+# Reproducible config for the LoRA/QLoRA fine-tune (train/finetune_lora.ipynb).
+# Runs on a free Colab/Kaggle GPU. The value here is judgment and method, not GPU
+# budget: an 8B-class instruct model with a small LoRA is plenty for this task.
+
+base_model: unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit   # non-gated 4-bit mirror
+max_seq_length: 1024
+load_in_4bit: true                                        # QLoRA
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.0
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+train:
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 4
+  num_train_epochs: 3
+  learning_rate: 0.0002
+  warmup_steps: 5
+  logging_steps: 5
+  seed: 13
+  output_dir: outputs
+  adapter_out: adapters/plain-notices-lora
+
+data:
+  train_file: data/pairs.jsonl
+  # System + user prompt mirror src/rewrite.py so train and inference match.
+  system: >-
+    You rewrite government benefit notices into plain language at a sixth-grade
+    reading level, preserving every operative fact (amounts, dates, the action,
+    the reason, and appeal/hearing rights with the deadline).
