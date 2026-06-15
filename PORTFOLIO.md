@@ -1,4 +1,4 @@
-# Portfolio notes — plain-language-notices
+# Portfolio notes: plain-language-notices
 
 A plain-language account of what this project is and the judgment behind it.
 
@@ -11,8 +11,8 @@ on a free GPU, with a domain-aware eval.
 
 Fine-tuning judgment and domain-aware eval design: choosing the right tool (and
 saying where I would not fine-tune), and designing a metric that catches the
-dangerous failure a readability score misses. The artifact is not the adapter, it
-is the judgment around it.
+dangerous failure a readability score misses. The artifact is the judgment around
+the adapter, more than the adapter itself.
 
 ## Why it matters in this domain
 
@@ -21,8 +21,8 @@ because they could not parse a letter. Plain-language rewriting helps at the sca
 of millions of notices, which is exactly where a small, consistent, cheap fine-tune
 beats calling a frontier model per notice. But a rewrite that improves readability
 while dropping the appeal deadline or changing the amount is worse than the
-original. So the project is built around a faithfulness gate, not a readability
-score.
+original. So the project is built around a faithfulness gate that sits over the
+readability score.
 
 ## Key design decisions and tradeoffs
 
@@ -38,7 +38,7 @@ score.
    legally operative facts are exactly checkable, and a deterministic gate is a
    harder, more trustworthy pass/fail than a model's opinion.
 
-3. **Reason preservation judged semantically, not by tokens.** A plain rewrite
+3. **Reason preservation judged semantically.** A plain rewrite
    paraphrases the reason, so token overlap would produce false failures. *Rejected:*
    forcing the reason through the deterministic gate (an earlier version did, and it
    failed faithful targets). Reason goes to the LLM judge; the gate stays exact.

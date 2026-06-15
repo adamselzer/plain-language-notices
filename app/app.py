@@ -36,17 +36,17 @@ st.set_page_config(page_title="Plain-language notices", layout="wide")
 apply_theme(st)
 
 CASE_STUDY = """
-<p class="cs-lead">Rewrite bureaucratic benefit notices into plain language while provably preserving every legally operative fact — the amount, the dates, the action, and the appeal rights.</p>
+<p class="cs-lead">Rewrite bureaucratic benefit notices into plain language while provably preserving every legally operative fact: the amount, the dates, the action, and the appeal rights.</p>
 
 <h2>Who it is for, and the need</h2>
-<p>People lose benefits they qualify for because they cannot understand the letters an agency sends. Rewriting those notices in plain language helps, at the scale of millions of notices. But a rewrite that reads beautifully and drops the appeal deadline is worse than the jargon it replaced. So the need is not just readability; it is readability that never loses a legally operative fact.</p>
+<p>People lose benefits they qualify for because they cannot understand the letters an agency sends. Rewriting those notices in plain language helps, at the scale of millions of notices. But a rewrite that reads beautifully and drops the appeal deadline is worse than the jargon it replaced. So the need is readability that never loses a legally operative fact.</p>
 
 <h2>What it does</h2>
-<p>It pairs each bureaucratic notice with a plain rewrite, scores the reading level, and runs a faithfulness gate that checks the operative facts survived exactly. It compares approaches — base-prompted, retrieval-augmented, and a small fine-tune — on readability, faithfulness, cost, and latency.</p>
+<p>It pairs each bureaucratic notice with a plain rewrite, scores the reading level, and runs a faithfulness gate that checks the operative facts survived exactly. It compares approaches (base-prompted, retrieval-augmented, and a small fine-tune) on readability, faithfulness, cost, and latency.</p>
 
 <h2>Technical decisions</h2>
 <div class="dec"><b>Fine-tune for this; RAG for policy questions</b><p>Rewriting is fixed-format, fixed-tone, high-volume work a small fine-tune holds cheaply. Policy Q&A belongs in retrieval, because policy changes and needs citations. Naming the boundary is the point.</p><p class="alt">Instead of: fine-tuning everything, or prompting everything.</p></div>
-<div class="dec"><b>A deterministic faithfulness gate</b><p>Amounts, dates, the action, and appeal rights are checked by exact matching; a drop or change fails outright. Preservation of the reason is semantic, so it is judged by an LLM, not brittle token matching.</p><p class="alt">Instead of: judging faithfulness entirely with a model, or trusting a readability score alone.</p></div>
+<div class="dec"><b>A deterministic faithfulness gate</b><p>Amounts, dates, the action, and appeal rights are checked by exact matching; a drop or change fails outright. Preservation of the reason is semantic, so an LLM judges it where exact matching would be too brittle.</p><p class="alt">Instead of: judging faithfulness entirely with a model, or trusting a readability score alone.</p></div>
 <div class="dec"><b>Self-contained readability</b><p>Flesch-Kincaid is implemented directly rather than via a library that downloads a corpus at runtime and fails offline.</p><p class="alt">Instead of: a dependency that breaks in locked-down environments.</p></div>
 <div class="dec"><b>Training off the laptop</b><p>The LoRA fine-tune runs on a free Colab GPU; the data pipeline, the gate, the eval, and the tests run anywhere with no GPU.</p><p class="alt">Instead of: making heavy training libraries a requirement to open the repo.</p></div>
 
@@ -98,7 +98,7 @@ with tab_demo:
         st.write(pair.original)
         st.metric("Flesch-Kincaid grade", flesch_kincaid_grade(pair.original))
     with c2:
-        st.subheader(f"Plain version — {source}")
+        st.subheader(f"Plain version: {source}")
         st.write(plain)
         grade = flesch_kincaid_grade(plain)
         st.metric("Flesch-Kincaid grade", grade, delta=round(grade - flesch_kincaid_grade(pair.original), 1))
@@ -111,7 +111,7 @@ with tab_demo:
     result = check_faithfulness(pair.operative_facts, plain)
     for c in result.checks:
         icon = "✅" if c.preserved else "❌"
-        st.markdown(f"{icon} **{c.fact}** — {c.detail}")
+        st.markdown(f"{icon} **{c.fact}**: {c.detail}")
     if result.passed:
         st.success("All operative facts preserved. Safe to send.")
     else:

@@ -1,4 +1,4 @@
-# Website blurb — plain-language-notices
+# Website blurb: plain-language-notices
 
 Drop-in copy for a portfolio page. A short paragraph plus highlight bullets.
 

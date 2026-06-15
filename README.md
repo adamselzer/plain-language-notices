@@ -1,13 +1,13 @@
 # plain-language-notices
 
 A small fine-tuned model that rewrites bureaucratic benefit notices into plain
-language **while provably preserving the legally operative facts** — the amount,
+language **while provably preserving the legally operative facts**: the amount,
 the dates, the action, the reason, and the appeal rights.
 
 This is the fine-tuning project in a four-part portfolio on AI in the public
 benefits safety net. The real artifact here is judgment: knowing when to fine-tune
 versus prompt versus retrieve, and building an eval that catches the failure mode
-unique to this task — a notice that reads beautifully and is legally wrong.
+unique to this task: a notice that reads beautifully and is legally wrong.
 
 > Incomprehensible government notices drive failed renewals and wrongful churn:
 > people lose benefits they qualify for because they could not understand a letter.
@@ -37,7 +37,7 @@ misstate the benefit amount. So the eval pairs a readability score with a
 - Preservation of the *reason* is semantic (a plain rewrite legitimately paraphrases
   it), so it is judged by the LLM in the eval rather than by brittle token matching.
 
-That split — exact facts gated deterministically, meaning judged by an LLM — is the
+That split (exact facts gated deterministically, meaning judged by an LLM) is the
 design choice that makes the gate both strict and fair.
 
 ## Architecture
@@ -103,7 +103,7 @@ RAG via Claude; fine-tuned pending the Colab run):
 
 | System | Target-grade hit | Mean FK grade | Faithfulness pass | Cost/notice |
 |---|---|---|---|---|
-| reference (gold targets) | 93% | 4.3 | 100% | — |
+| reference (gold targets) | 93% | 4.3 | 100% | n/a |
 | base-prompted | 20% | 8.5 | 100% | $0.0018 |
 | RAG (plain-language guide in context) | 100% | 4.2 | 100% | $0.0019 |
 | fine-tuned | _train via `train/finetune_lora.ipynb`_ | | | |
