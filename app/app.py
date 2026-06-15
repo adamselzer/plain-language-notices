@@ -45,7 +45,7 @@ CASE_STUDY = """
 <p>It pairs each bureaucratic notice with a plain rewrite, scores the reading level, and runs a faithfulness gate that checks the operative facts survived exactly. It compares approaches (base-prompted, retrieval-augmented, and a small fine-tune) on readability, faithfulness, cost, and latency.</p>
 
 <h2>Technical decisions</h2>
-<div class="dec"><b>Fine-tune for this; RAG for policy questions</b><p>Rewriting is fixed-format, fixed-tone, high-volume work a small fine-tune holds cheaply. Policy Q&A belongs in retrieval, because policy changes and needs citations. Naming the boundary is the point.</p><p class="alt">Instead of: fine-tuning everything, or prompting everything.</p></div>
+<div class="dec"><b>Fine-tune for this; RAG for policy questions</b><p>Rewriting is fixed-format, fixed-tone, high-volume work a small fine-tune holds cheaply. Policy Q&A belongs in retrieval, because policy changes and needs citations. The judgment is matching each tool to the task it fits.</p><p class="alt">Instead of: fine-tuning everything, or prompting everything.</p></div>
 <div class="dec"><b>A deterministic faithfulness gate</b><p>Amounts, dates, the action, and appeal rights are checked by exact matching; a drop or change fails outright. Preservation of the reason is semantic, so an LLM judges it where exact matching would be too brittle.</p><p class="alt">Instead of: judging faithfulness entirely with a model, or trusting a readability score alone.</p></div>
 <div class="dec"><b>Self-contained readability</b><p>Flesch-Kincaid is implemented directly rather than via a library that downloads a corpus at runtime and fails offline.</p><p class="alt">Instead of: a dependency that breaks in locked-down environments.</p></div>
 <div class="dec"><b>Training off the laptop</b><p>The LoRA fine-tune runs on a free Colab GPU; the data pipeline, the gate, the eval, and the tests run anywhere with no GPU.</p><p class="alt">Instead of: making heavy training libraries a requirement to open the repo.</p></div>
@@ -56,7 +56,7 @@ CASE_STUDY = """
 
 <h2>Honest limitations</h2>
 <ul>
-<li>The synthetic notices are simple, so all systems preserve the facts (100%); the gate earns its keep on harder notices.</li>
+<li>The synthetic notices are simple, so all systems preserve the facts (100%); the gate does its work on harder notices.</li>
 <li>The fine-tuned row of the comparison awaits the Colab training run.</li>
 <li>A larger human-rated sample would anchor the automated readability and faithfulness scores.</li>
 </ul>

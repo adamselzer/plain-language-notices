@@ -116,7 +116,7 @@ readability completely (100%). The fine-tune's job is to match that readability
 millions of notices. That is the row the Colab training fills in.
 
 Faithfulness is 100% across all systems here because the synthetic notices are
-simple and the models are strong; the gate earns its keep on harder notices where a
+simple and the models are strong; the gate does its work on harder notices where a
 model drops or alters an operative fact. A small human-rated sample (tone/clarity on
 ~20 examples) sanity-checks the automated scores.
 

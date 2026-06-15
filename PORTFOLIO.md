@@ -30,7 +30,7 @@ readability score.
    rewriting is fixed-format, fixed-tone, high-volume, which a fine-tune holds
    better and cheaper than prompting; policy Q&A belongs in RAG because policy
    changes and needs citations. *Rejected:* fine-tuning everything, or prompting
-   everything. Naming the boundary is the senior signal.
+   everything. The judgment is in matching each tool to the task it fits.
 
 2. **A deterministic faithfulness gate on the exactly-checkable facts.** Amount,
    dates, action, and appeal rights are verified by exact matching; a drop or change
