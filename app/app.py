@@ -15,6 +15,7 @@ Run:  streamlit run app/app.py
 
 from __future__ import annotations
 
+import utils.session
 import difflib
 import json
 import sys

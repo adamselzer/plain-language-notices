@@ -1,6 +1,4 @@
 # Secrets
-.env
-.env.*
 # Python
 __pycache__/
 *.py[cod]
@@ -19,3 +17,5 @@ outputs/
 .DS_Store
 # Transient eval run log
 eval/_llm_run.log
+config.bat
+node_modules
