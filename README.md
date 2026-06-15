@@ -1,19 +1,11 @@
 # plain-language-notices
 
-A small fine-tuned model that rewrites bureaucratic benefit notices into plain
-language **while provably preserving the legally operative facts**: the amount,
-the dates, the action, the reason, and the appeal rights.
+A small fine-tuned model that rewrites bureaucratic benefit notices into plain language — and proves it kept the facts that matter: the amount, the dates, the action, the reason, and the appeal rights.
 
-This is the fine-tuning project in a four-part portfolio on AI in the public
-benefits safety net. The real artifact here is judgment: knowing when to fine-tune
-versus prompt versus retrieve, and building an eval that catches the failure mode
-unique to this task: a notice that reads beautifully and is legally wrong.
+This is the fine-tuning project in a four-part portfolio on AI in the public benefits safety net. The model is the deliverable. The judgment is the point: knowing when to fine-tune versus prompt versus retrieve, and building an eval that catches the one failure mode unique to this task — a notice that reads beautifully and is legally wrong.
 
-> Incomprehensible government notices drive failed renewals and wrongful churn:
-> people lose benefits they qualify for because they could not understand a letter.
-> Rewriting notices in plain language helps, but only if the rewrite keeps every
-> operative fact. A readable notice that drops the appeal deadline is worse than the
-> jargon it replaced. So readability alone is never the metric.
+Incomprehensible government notices drive failed renewals and wrongful churn. People lose benefits they qualify for because they could not understand a letter. Plain language helps, but only if the rewrite keeps every operative fact. A readable notice that drops the appeal deadline is worse than the jargon it replaced. So readability is never the metric on its own.
+
 
 ## When to fine-tune (and when not), stated up front
 
