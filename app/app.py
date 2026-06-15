@@ -64,7 +64,7 @@ CASE_STUDY = """
 
 header(
     st,
-    "Safety-Net AI · Fine-tuning",
+    "Plain-language notices · food assistance",
     "Plain-language benefit notices",
     "Rewrite a bureaucratic notice into plain language while preserving every "
     "operative fact. The checklist runs a deterministic faithfulness gate: a "
